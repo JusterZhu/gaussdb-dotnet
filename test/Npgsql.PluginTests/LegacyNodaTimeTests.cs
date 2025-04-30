@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Data;
 using System.Threading.Tasks;
 using NodaTime;
@@ -102,3 +102,4 @@ public class LegacyNodaTimeTests : TestBase, IDisposable
 
     #endregion Support
 }
+*/

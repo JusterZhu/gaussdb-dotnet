@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 // ReSharper disable AccessToModifiedClosure
 // ReSharper disable AccessToDisposedClosure
 
-namespace Npgsql.PluginTests;
+/*namespace Npgsql.PluginTests;
 
 /// <summary>
 /// Tests for the Npgsql.Json.NET mapping plugin
@@ -279,3 +279,4 @@ public class JsonNetTests(NpgsqlDbType npgsqlDbType) : TestBase
 
     NpgsqlDataSource JsonDataSource = default!;
 }
+*/

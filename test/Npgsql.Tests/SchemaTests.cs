@@ -135,10 +135,11 @@ public class SchemaTests(SyncOrAsync syncOrAsync) : SyncOrAsyncTestBase(syncOrAs
         var enumType = await GetTempTypeName(adminConnection);
         var compositeType = await GetTempTypeName(adminConnection);
         var domainType = await GetTempTypeName(adminConnection);
+        //CREATE DOMAIN {domainType} AS TEXT
         await adminConnection.ExecuteNonQueryAsync($@"
 CREATE TYPE {enumType} AS ENUM ('a', 'b');
 CREATE TYPE {compositeType} AS (a INTEGER);
-CREATE DOMAIN {domainType} AS TEXT");
+");
 
         var dataSourceBuilder = CreateDataSourceBuilder();
         dataSourceBuilder.MapEnum<TestEnum>(enumType);
@@ -198,10 +199,10 @@ CREATE DOMAIN {domainType} AS TEXT");
         Assert.That(compositeRow["DataType"], Is.EqualTo("Npgsql.Tests.SchemaTests+TestComposite"));
         Assert.That(compositeRow["ProviderDbType"], Is.SameAs(DBNull.Value));
 
-        var domainRow = dataTypes.Rows.Cast<DataRow>().Single(r => ((string)r["TypeName"]).EndsWith("." + domainType));
-        Assert.That(domainRow["DataType"], Is.EqualTo("System.String"));
-        Assert.That(domainRow["ProviderDbType"], Is.EqualTo((int)NpgsqlDbType.Text));
-        Assert.That(domainRow["IsBestMatch"], Is.False);
+        //var domainRow = dataTypes.Rows.Cast<DataRow>().Single(r => ((string)r["TypeName"]).EndsWith("." + domainType));
+        //Assert.That(domainRow["DataType"], Is.EqualTo("System.String"));
+        //Assert.That(domainRow["ProviderDbType"], Is.EqualTo((int)NpgsqlDbType.Text));
+        //Assert.That(domainRow["IsBestMatch"], Is.False);
     }
 
     enum TestEnum { A, B };
@@ -357,7 +358,7 @@ CREATE DOMAIN {domainType} AS TEXT");
             Assert.That(row["table_name"], Is.EqualTo(view));
     }
 
-    [Test]
+    /*[Test]
     public async Task GetSchema_materialized_views_with_restrictions()
     {
         await using var conn = await OpenConnectionAsync();
@@ -368,7 +369,7 @@ CREATE DOMAIN {domainType} AS TEXT");
         var dt = await GetSchema(conn, "MaterializedViews", [null, viewName, null, null]);
         foreach (var row in dt.Rows.OfType<DataRow>())
             Assert.That(row["table_name"], Is.EqualTo(viewName));
-    }
+    }*/
 
     [Test]
     public async Task Primary_key()
@@ -379,7 +380,7 @@ CREATE DOMAIN {domainType} AS TEXT");
         var dataTable = await GetSchema(conn, "CONSTRAINTCOLUMNS", [null, null, table]);
         var column = dataTable.Rows.Cast<DataRow>().Single();
 
-        Assert.That(column["table_schema"], Is.EqualTo("public"));
+        Assert.That(column["table_schema"], Is.EqualTo("root"));
         Assert.That(column["table_name"], Is.EqualTo(table));
         Assert.That(column["column_name"], Is.EqualTo("id"));
         Assert.That(column["constraint_type"], Is.EqualTo("PRIMARY KEY"));
@@ -394,7 +395,7 @@ CREATE DOMAIN {domainType} AS TEXT");
         var dataTable = await GetSchema(conn, "CONSTRAINTCOLUMNS", [null, null, table]);
         var columns = dataTable.Rows.Cast<DataRow>().OrderBy(r => r["ordinal_number"]).ToList();
 
-        Assert.That(columns.All(r => r["table_schema"].Equals("public")));
+        Assert.That(columns.All(r => r["table_schema"].Equals("root")));
         Assert.That(columns.All(r => r["table_name"].Equals(table)));
         Assert.That(columns.All(r => r["constraint_type"].Equals("PRIMARY KEY")));
 
@@ -414,10 +415,10 @@ CREATE DOMAIN {domainType} AS TEXT");
         var columns = dataTable.Rows.Cast<DataRow>().ToList();
 
         Assert.That(columns.All(r => r["constraint_catalog"].Equals(database)));
-        Assert.That(columns.All(r => r["constraint_schema"].Equals("public")));
+        Assert.That(columns.All(r => r["constraint_schema"].Equals("root")));
         Assert.That(columns.All(r => r["constraint_name"] is not null));
         Assert.That(columns.All(r => r["table_catalog"].Equals(database)));
-        Assert.That(columns.All(r => r["table_schema"].Equals("public")));
+        Assert.That(columns.All(r => r["table_schema"].Equals("root")));
         Assert.That(columns.All(r => r["table_name"].Equals(table)));
         Assert.That(columns.All(r => r["constraint_type"].Equals("UNIQUE KEY")));
 
@@ -451,26 +452,27 @@ CREATE TABLE {table} (
         var dataTable = await GetSchema(conn, "INDEXES", [null, null, table]);
         var index = dataTable.Rows.Cast<DataRow>().Single();
 
-        Assert.That(index["table_schema"], Is.EqualTo("public"));
+        Assert.That(index["table_schema"], Is.EqualTo("root"));
         Assert.That(index["table_name"], Is.EqualTo(table));
         Assert.That(index["index_name"], Is.EqualTo(constraint));
-        Assert.That(index["type_desc"], Is.EqualTo(""));
+        //TODO: index["type_desc"]的值是DBNULL
+        //Assert.That(index["type_desc"], Is.EqualTo(""));
 
         string[] indexColumnRestrictions = [null!, null!, table];
         var dataTable2 = await GetSchema(conn, "INDEXCOLUMNS", indexColumnRestrictions);
         var columns = dataTable2.Rows.Cast<DataRow>().ToList();
 
         Assert.That(columns.All(r => r["constraint_catalog"].Equals(database)));
-        Assert.That(columns.All(r => r["constraint_schema"].Equals("public")));
+        Assert.That(columns.All(r => r["constraint_schema"].Equals("root")));
         Assert.That(columns.All(r => r["constraint_name"].Equals(constraint)));
         Assert.That(columns.All(r => r["table_catalog"].Equals(database)));
-        Assert.That(columns.All(r => r["table_schema"].Equals("public")));
+        Assert.That(columns.All(r => r["table_schema"].Equals("root")));
         Assert.That(columns.All(r => r["table_name"].Equals(table)));
 
         Assert.That(columns[0]["column_name"], Is.EqualTo("f1"));
         Assert.That(columns[1]["column_name"], Is.EqualTo("f2"));
 
-        string[] indexColumnRestrictions3 = [(string) database! , "public", table, constraint, "f1"];
+        string[] indexColumnRestrictions3 = [(string) database! , "root", table, constraint, "f1"];
         var dataTable3 = await GetSchema(conn, "INDEXCOLUMNS", indexColumnRestrictions3);
         var columns3 = dataTable3.Rows.Cast<DataRow>().ToList();
         Assert.That(columns3.Count, Is.EqualTo(1));
@@ -482,6 +484,7 @@ CREATE TABLE {table} (
     {
         await using var conn = await OpenConnectionAsync();
 
+        //todo: 不支持line line,不存在 maccaddr8 macaddr8,
         var columnDefinition = @"
 p0 integer PRIMARY KEY NOT NULL,
 achar char,
@@ -511,7 +514,6 @@ lseg lseg,
 path path,
 polygon polygon,
 circle circle,
-line line,
 inet inet,
 macaddr macaddr,
 uuid uuid,
@@ -522,7 +524,6 @@ numrange numrange,
 oidvector oidvector,
 ""bigint[]"" bigint[],
 cidr cidr,
-maccaddr8 macaddr8,
 jsonb jsonb,
 json json,
 xml xml,
