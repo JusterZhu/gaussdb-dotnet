@@ -22,7 +22,7 @@ jobs:
   build:
     runs-on: "ubuntu-latest"
     env:
-      NPGSQL_TEST_DB: "Host=localhost;Port=5432;Username=gaussdb;Password=Password@1234;Database=gaussdb_tests;IncludeErrorDetail=true"
+      NPGSQL_TEST_DB: "Host=localhost;Port=5432;Username=gaussdb;Password=Password@1234;Database=gaussdb_tests;"
 
     # Service containers to run with `container-job`
     # https://docs.github.com/en/actions/use-cases-and-examples/using-containerized-services/creating-postgresql-service-containers
@@ -38,7 +38,8 @@ jobs:
           - 5432:5432
         # Set health checks to wait until postgres has started
         options: >-
-          --health-cmd "sleep 20"
+          --name opengauss
+          --health-cmd "sleep 15"
           --health-interval 10s
           --health-timeout 30s
           --health-retries 10
@@ -52,6 +53,19 @@ jobs:
           #   test_tfm: net9.0
 
     steps:
+      - name: Update configuration
+        run: |
+          docker exec opengauss bash -c "sed -i 's/^max_wal_senders\s*=\s*4/max_wal_senders = 80/' /var/lib/opengauss/data/postgresql.conf"
+          docker exec opengauss bash -c "sed -i 's/^max_connections\s*=\s*200/max_connections = 500/' /var/lib/opengauss/data/postgresql.conf"
+          docker exec opengauss bash -c "cat /var/lib/opengauss/data/postgresql.conf"
+          docker restart opengauss
+          for i in {1..30}; do
+            if [ "$(docker inspect --format='{{json .State.Health.Status}}' opengauss)" == "\"healthy\"" ]; then
+              break
+            fi
+            sleep 1
+          done
+
       - name: Checkout
         uses: actions/checkout@v4
 
