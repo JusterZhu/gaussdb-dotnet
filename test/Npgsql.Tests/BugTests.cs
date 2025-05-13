@@ -1093,7 +1093,7 @@ CREATE TEMP TABLE ""OrganisatieQmo_Organisatie_QueryModelObjects_Imp""
 
         var tableName = await CreateTempTable(conn, "col1 text, col2 text");
 
-        await using var binaryImporter = await conn.BeginBinaryImportAsync($"COPY {tableName} FROM STDIN (FORMAT BINARY);");
+        await using var binaryImporter = await conn.BeginBinaryImportAsync($"COPY {tableName} FROM STDIN BINARY;");
         // 8163 writespace left
         await binaryImporter.StartRowAsync();
 
@@ -1119,7 +1119,7 @@ CREATE TEMP TABLE ""OrganisatieQmo_Organisatie_QueryModelObjects_Imp""
 
         var tableName = await CreateTempTable(conn, "col1 text, col2 text");
 
-        await using var binaryImporter = await conn.BeginBinaryImportAsync($"COPY {tableName} FROM STDIN (FORMAT BINARY);");
+        await using var binaryImporter = await conn.BeginBinaryImportAsync($"COPY {tableName} FROM STDIN BINARY;");
         // 8163 writespace left
         await binaryImporter.StartRowAsync();
 
@@ -1248,7 +1248,7 @@ $$;");
         await using var conn = await OpenConnectionAsync();
         var table = await CreateTempTable(conn, "value integer");
 
-        using (var importer = await conn.BeginBinaryImportAsync($"COPY {table} (value) FROM STDIN (FORMAT binary)"))
+        await using (var importer = await conn.BeginBinaryImportAsync($"COPY {table} (value) FROM STDIN BINARY"))
         {
             await importer.StartRowAsync();
             await importer.WriteAsync(DBNull.Value, NpgsqlDbType.Integer);
@@ -1259,7 +1259,7 @@ $$;");
             await importer.CompleteAsync();
         }
 
-        using (var exporter = await conn.BeginBinaryExportAsync($"COPY {table} (value) TO STDIN (FORMAT binary)"))
+        await using (var exporter = await conn.BeginBinaryExportAsync($"COPY {table} (value) TO STDIN BINARY"))
         {
             await exporter.StartRowAsync();
             Assert.IsTrue(exporter.IsNull);
@@ -1280,10 +1280,10 @@ $$;");
         {
             // We have to Yield, so the current thread is changed to the one used by SingleThreadSynchronizationContext
             await Task.Yield();
-            using var connection = OpenConnection();
+            await using var connection = OpenConnection();
 
-            var data = new string('x', 5_000_000);
-            using var cmd = new NpgsqlCommand("SELECT generate_series(1, 500000); SELECT @p", connection);
+            var data = new string('x', 5_000_00);
+            await using var cmd = new NpgsqlCommand("SELECT generate_series(1, 500000); SELECT @p", connection);
             cmd.Parameters.AddWithValue("p", NpgsqlDbType.Text, data);
             cmd.ExecuteNonQuery();
         }

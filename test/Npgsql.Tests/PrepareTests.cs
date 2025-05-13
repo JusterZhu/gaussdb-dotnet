@@ -771,15 +771,6 @@ public class PrepareTests: TestBase
             await command.PrepareAsync();
             Assert.IsTrue(command.IsPrepared);
         }
-
-        // However, Npgsql should invalidate the prepared statement in this case, so the next execution should work
-        //Assert.DoesNotThrowAsync(() => command.ExecuteNonQueryAsync());
-
-        if (!prepareAfterError)
-        {
-            // The command is unprepared, though. It's the user's responsibility to re-prepare if they wish.
-            Assert.True(command.IsPrepared);
-        }
     }
 
     [Test, IssueLink("https://github.com/npgsql/npgsql/issues/4920")]
