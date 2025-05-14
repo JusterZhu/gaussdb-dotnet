@@ -1,4 +1,4 @@
-# GaussDB
+# GaussDB Npgsql Driver
 
 [![PostgreSQL License](https://img.shields.io/badge/License-PostgreSQL-blue.svg)](https://opensource.org/licenses/PostgreSQL)
 
@@ -12,7 +12,7 @@ Before getting started, developers can download the [Open Source for Huawei Wiki
 
 
 
-## Quickstart
+## Quick start
 
 Here's a basic code snippet to get you started:
 
@@ -21,19 +21,17 @@ using GaussDB;
 
 var connString = "Host=myserver;Username=mylogin;Password=mypass;Database=mydatabase";
 
-var dataSourceBuilder = new GaussDataSourceBuilder(connString);
+var dataSourceBuilder = new GaussDBDataSourceBuilder(connString);
 var dataSource = dataSourceBuilder.Build();
 
 var conn = await dataSource.OpenConnectionAsync();
 
-// Insert some data
-await using (var cmd = new GaussCommand("INSERT INTO data (some_field) VALUES (@p)", conn))
+await using (var cmd = new GaussDBCommand("INSERT INTO data (some_field) VALUES (@p)", conn))
 {
     cmd.Parameters.AddWithValue("p", "Hello world");
     await cmd.ExecuteNonQueryAsync();
 }
 
-// Retrieve all rows
 await using (var cmd = new GaussCommand("SELECT some_field FROM data", conn))
 await using (var reader = await cmd.ExecuteReaderAsync())
 {
@@ -41,3 +39,10 @@ await using (var reader = await cmd.ExecuteReaderAsync())
         Console.WriteLine(reader.GetString(0));
 }
 ```
+
+
+
+
+
+## License
+This project is released under of the [PostgreSQL License](https://opensource.org/license/PostgreSQL).
