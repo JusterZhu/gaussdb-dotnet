@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <PackageId>HuaweiCloud.GaussDB.DependencyInjection</PackageId>
+        <RootNamespace>HuaweiCloud.GaussDB.DependencyInjection</RootNamespace>
+        <Authors>gaussdb-dotnet team</Authors>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageTags>gaussdb;openguass;ado;ado.net;database;sql;di;dependency injection</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\GaussDB\GaussDB.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+        <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+</Project>
