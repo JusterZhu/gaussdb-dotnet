@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PackageId>HuaweiCloud.GaussDB.NetTopologySuite</PackageId>
+    <RootNamespace>HuaweiCloud.GaussDB.NetTopologySuite</RootNamespace>
+    <Authors>gaussdb-dotnet team</Authors>
+    <Description>NetTopologySuite plugin for GaussDB, allowing mapping of PostGIS geometry types to NetTopologySuite types.</Description>
+    <PackageTags>gaussdb;openguass;postgis;spatial;nettopologysuite;nts;ado;ado.net;database;sql</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <TargetFramework>net8.0</TargetFramework>
+    <NoWarn>$(NoWarn);NU5104</NoWarn>
+    <NoWarn>$(NoWarn);NPG9001</NoWarn> <!-- Converter-related APIs are experimental -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NetTopologySuite.IO.PostGIS" />
+    <PackageReference Include="NetTopologySuite" />
+    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" PrivateAssets="All" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../GaussDB/GaussDB.csproj" />
+    <ProjectReference Include="../GaussDB.SourceGenerators/GaussDB.SourceGenerators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+</Project>

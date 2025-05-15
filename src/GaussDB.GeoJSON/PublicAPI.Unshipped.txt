@@ -1,0 +1,3 @@
+#nullable enable
+static HuaweiCloud.GaussDB.GaussDBGeoJSONExtensions.UseGeoJson<TMapper>(this TMapper mapper, HuaweiCloud.GaussDB.GeoJSON.CrsMap! crsMap, HuaweiCloud.GaussDB.GeoJSONOptions options = HuaweiCloud.GaussDB.GeoJSONOptions.None, bool geographyAsDefault = false) -> TMapper
+static HuaweiCloud.GaussDB.GaussDBGeoJSONExtensions.UseGeoJson<TMapper>(this TMapper mapper, HuaweiCloud.GaussDB.GeoJSONOptions options = HuaweiCloud.GaussDB.GeoJSONOptions.None, bool geographyAsDefault = false) -> TMapper
